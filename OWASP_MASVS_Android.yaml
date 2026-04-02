@@ -1,0 +1,569 @@
+metadata:
+  title: OWASP MASVS for Android
+  remarks: >
+    An Android-specific adaptation of the OWASP Mobile Application Security
+    Verification Standard (MASVS) with detailed, platform-native requirements,
+    API-level guidance, and implementation references. This is a community fork
+    maintained for teams that need Android-specific security requirements.
+  version: v1.0.0
+  upstream: OWASP MASVS v2.1.0
+  platform: Android 10 (API 29) through Android 16 (API 36)
+  license: CC BY-SA 4.0
+
+groups:
+  - id: MASVS-STORAGE
+    index: 1
+    title: Secure Data Storage at Rest
+    description: >
+      Protection of sensitive data stored locally on the Android device using
+      internal storage, AndroidKeyStore, encrypted DataStore/Tink, and proper
+      backup exclusion.
+    controls:
+      - id: MASVS-STORAGE-1
+        statement: The app securely stores sensitive data.
+        description: >
+          Ensures sensitive data is stored in internal storage with encryption
+          (Tink/DataStore, SQLCipher), backed by hardware-secured AndroidKeyStore
+          keys, with backup exclusion and memory clearing.
+        sub_requirements:
+          - id: MASVS-STORAGE-1.1
+            statement: Use internal storage for sensitive data
+          - id: MASVS-STORAGE-1.2
+            statement: Encrypt sensitive data at rest with Tink/DataStore
+          - id: MASVS-STORAGE-1.3
+            statement: Never store secrets in SharedPreferences without encryption
+          - id: MASVS-STORAGE-1.4
+            statement: Encrypt databases containing sensitive data (SQLCipher)
+          - id: MASVS-STORAGE-1.5
+            statement: Use MODE_PRIVATE for all file creation
+          - id: MASVS-STORAGE-1.6
+            statement: Protect AndroidKeyStore keys with user authentication
+          - id: MASVS-STORAGE-1.7
+            statement: Prefer StrongBox-backed key storage
+          - id: MASVS-STORAGE-1.8
+            statement: Exclude sensitive data from Auto Backup
+          - id: MASVS-STORAGE-1.9
+            statement: Clear sensitive data from memory when no longer needed
+
+      - id: MASVS-STORAGE-2
+        statement: The app prevents leakage of sensitive data.
+        description: >
+          Prevents unintentional exposure of sensitive data through system logs,
+          screenshots, clipboard, keyboard cache, notifications, autofill, crash
+          reports, and WebView caches.
+        sub_requirements:
+          - id: MASVS-STORAGE-2.1
+            statement: No sensitive data in system logs
+          - id: MASVS-STORAGE-2.2
+            statement: Prevent screenshots and screen recording (FLAG_SECURE)
+          - id: MASVS-STORAGE-2.3
+            statement: Disable keyboard cache for sensitive input fields
+          - id: MASVS-STORAGE-2.4
+            statement: Prevent sensitive data in clipboard
+          - id: MASVS-STORAGE-2.5
+            statement: Mask sensitive data in notifications
+          - id: MASVS-STORAGE-2.6
+            statement: Disable autofill for sensitive fields where inappropriate
+          - id: MASVS-STORAGE-2.7
+            statement: Prevent data leakage via app backgrounding
+          - id: MASVS-STORAGE-2.8
+            statement: Exclude sensitive data from crash reports and analytics
+          - id: MASVS-STORAGE-2.9
+            statement: Prevent WebView cache and storage leaks
+
+  - id: MASVS-CRYPTO
+    index: 2
+    title: Cryptography
+    description: >
+      Proper use of cryptographic algorithms and key management using the
+      AndroidKeyStore, hardware-backed TEE/StrongBox, and Google Tink.
+    controls:
+      - id: MASVS-CRYPTO-1
+        statement: The app employs current strong cryptography and uses it according to industry best practices.
+        description: >
+          Ensures use of approved algorithms (AES-256-GCM, ECDSA P-256, etc.),
+          proper IV/nonce generation, no hardcoded keys, and correct
+          Cipher.getInstance() usage via AndroidKeyStore.
+        sub_requirements:
+          - id: MASVS-CRYPTO-1.1
+            statement: Use approved cryptographic algorithms only
+          - id: MASVS-CRYPTO-1.2
+            statement: Never use ECB block mode
+          - id: MASVS-CRYPTO-1.3
+            statement: Generate IVs and nonces securely via SecureRandom
+          - id: MASVS-CRYPTO-1.4
+            statement: Do not hardcode cryptographic keys
+          - id: MASVS-CRYPTO-1.5
+            statement: Use AndroidKeyStore provider for cryptographic operations
+          - id: MASVS-CRYPTO-1.6
+            statement: Verify hardware-backed key storage
+          - id: MASVS-CRYPTO-1.7
+            statement: Use SecureRandom for all random number generation
+          - id: MASVS-CRYPTO-1.8
+            statement: Avoid insecure Cipher.getInstance() calls
+
+      - id: MASVS-CRYPTO-2
+        statement: The app performs key management according to industry best practices.
+        description: >
+          Ensures proper key lifecycle management — generation inside KeyStore,
+          restricted purposes, authentication binding, validity periods, key
+          attestation, and secure deletion.
+        sub_requirements:
+          - id: MASVS-CRYPTO-2.1
+            statement: Generate keys inside the AndroidKeyStore
+          - id: MASVS-CRYPTO-2.2
+            statement: Restrict key purpose to minimum necessary
+          - id: MASVS-CRYPTO-2.3
+            statement: Bind keys to user authentication
+          - id: MASVS-CRYPTO-2.4
+            statement: Set key validity periods
+          - id: MASVS-CRYPTO-2.5
+            statement: Invalidate keys on biometric enrollment changes
+          - id: MASVS-CRYPTO-2.6
+            statement: Use key attestation for remote verification
+          - id: MASVS-CRYPTO-2.7
+            statement: Delete keys when no longer needed
+          - id: MASVS-CRYPTO-2.8
+            statement: Never export key material from hardware
+
+  - id: MASVS-AUTH
+    index: 3
+    title: Authentication and Authorization
+    description: >
+      Secure authentication using Credential Manager, crypto-bound BiometricPrompt,
+      passkeys, Protected Confirmation, and proper token management.
+    controls:
+      - id: MASVS-AUTH-1
+        statement: The app uses secure authentication and authorization protocols and follows the relevant best practices.
+        description: >
+          Covers Credential Manager API usage, passkey support, secure token
+          storage, token refresh/expiration, complete logout, and TLS integrity
+          in auth flows.
+        sub_requirements:
+          - id: MASVS-AUTH-1.1
+            statement: Use Credential Manager API for authentication
+          - id: MASVS-AUTH-1.2
+            statement: Prefer passkeys over passwords
+          - id: MASVS-AUTH-1.3
+            statement: Store authentication tokens securely
+          - id: MASVS-AUTH-1.4
+            statement: Implement token refresh and expiration
+          - id: MASVS-AUTH-1.5
+            statement: Clear authentication state on logout
+          - id: MASVS-AUTH-1.6
+            statement: Do not implement custom TLS in auth flows
+
+      - id: MASVS-AUTH-2
+        statement: The app performs local authentication securely according to the platform best practices.
+        description: >
+          Covers crypto-bound BiometricPrompt, Class 3 biometric requirement,
+          enrollment change handling, availability checks, lockout behavior, and
+          Protected Confirmation for high-value transactions.
+        sub_requirements:
+          - id: MASVS-AUTH-2.1
+            statement: Use BiometricPrompt with CryptoObject binding
+          - id: MASVS-AUTH-2.2
+            statement: Require strong biometrics (Class 3 / BIOMETRIC_STRONG)
+          - id: MASVS-AUTH-2.3
+            statement: Handle biometric enrollment changes
+          - id: MASVS-AUTH-2.4
+            statement: Check biometric availability before prompting
+          - id: MASVS-AUTH-2.5
+            statement: Implement lockout on failed biometric attempts
+          - id: MASVS-AUTH-2.6
+            statement: Use Protected Confirmation for high-value transactions
+
+      - id: MASVS-AUTH-3
+        statement: The app secures sensitive operations with additional authentication.
+        description: >
+          Covers step-up authentication gates, crypto-bound re-authentication,
+          per-use key authentication, server-side verification, MFA support,
+          and rate limiting.
+        sub_requirements:
+          - id: MASVS-AUTH-3.1
+            statement: Gate sensitive operations with step-up authentication
+          - id: MASVS-AUTH-3.2
+            statement: Bind step-up authentication to cryptographic operations
+          - id: MASVS-AUTH-3.3
+            statement: Use per-use key authentication for critical operations
+          - id: MASVS-AUTH-3.4
+            statement: Implement server-side step-up verification
+          - id: MASVS-AUTH-3.5
+            statement: Support multi-factor authentication
+          - id: MASVS-AUTH-3.6
+            statement: Rate-limit step-up authentication attempts
+
+  - id: MASVS-NETWORK
+    index: 4
+    title: Network Communication
+    description: >
+      Secure network configuration via Network Security Config, TLS enforcement,
+      certificate pinning, and protection against MITM attacks.
+    controls:
+      - id: MASVS-NETWORK-1
+        statement: The app secures all network traffic according to the current best practices.
+        description: >
+          Covers cleartext blocking, TLS 1.2+ enforcement, prohibition of custom
+          TrustManager/HostnameVerifier, user CA restrictions, Network Security
+          Config usage, WebSocket/gRPC security, and DNS security.
+        sub_requirements:
+          - id: MASVS-NETWORK-1.1
+            statement: Disable cleartext traffic
+          - id: MASVS-NETWORK-1.2
+            statement: Enforce TLS 1.2 minimum, prefer TLS 1.3
+          - id: MASVS-NETWORK-1.3
+            statement: Do not override TrustManager or HostnameVerifier
+          - id: MASVS-NETWORK-1.4
+            statement: Do not trust user-installed CA certificates in production
+          - id: MASVS-NETWORK-1.5
+            statement: Validate server certificates properly
+          - id: MASVS-NETWORK-1.6
+            statement: Use Network Security Config for all TLS policy
+          - id: MASVS-NETWORK-1.7
+            statement: Secure WebSocket and non-HTTP connections
+          - id: MASVS-NETWORK-1.8
+            statement: Consider DNS security (DoH/DoT)
+
+      - id: MASVS-NETWORK-2
+        statement: The app performs identity pinning for all remote endpoints under the developer's control.
+        description: >
+          Covers SPKI-based certificate pinning via Network Security Config,
+          backup pins, expiration dates, failure reporting, and Certificate
+          Transparency.
+        sub_requirements:
+          - id: MASVS-NETWORK-2.1
+            statement: Implement certificate pinning via Network Security Config
+          - id: MASVS-NETWORK-2.2
+            statement: Include backup pins for key rotation
+          - id: MASVS-NETWORK-2.3
+            statement: Set pin expiration dates
+          - id: MASVS-NETWORK-2.4
+            statement: Pin against SPKI hashes, not certificate hashes
+          - id: MASVS-NETWORK-2.5
+            statement: Implement pinning failure reporting
+          - id: MASVS-NETWORK-2.6
+            statement: Consider Certificate Transparency
+
+  - id: MASVS-PLATFORM
+    index: 5
+    title: Platform Interaction
+    description: >
+      Secure use of Android IPC mechanisms (Intents, Content Providers, Broadcasts,
+      Services), WebViews, deep links, and UI security (tapjacking, task hijacking).
+    controls:
+      - id: MASVS-PLATFORM-1
+        statement: The app uses IPC mechanisms securely.
+        description: >
+          Covers exported component minimization, permission protection, explicit
+          intents, intent data validation, intent redirection prevention,
+          PendingIntent security, Content Provider security, Broadcast Receiver
+          security, Service security, and deep link/App Link security.
+        sub_requirements:
+          - id: MASVS-PLATFORM-1.1
+            statement: Minimize exported components
+          - id: MASVS-PLATFORM-1.2
+            statement: Protect exported components with permissions
+          - id: MASVS-PLATFORM-1.3
+            statement: Use explicit intents for sensitive communication
+          - id: MASVS-PLATFORM-1.4
+            statement: Validate all intent data
+          - id: MASVS-PLATFORM-1.5
+            statement: Prevent intent redirection
+          - id: MASVS-PLATFORM-1.6
+            statement: Use FLAG_IMMUTABLE for PendingIntents
+          - id: MASVS-PLATFORM-1.7
+            statement: Secure Content Providers
+          - id: MASVS-PLATFORM-1.8
+            statement: Secure Broadcast Receivers
+          - id: MASVS-PLATFORM-1.9
+            statement: Secure Bound Services
+          - id: MASVS-PLATFORM-1.10
+            statement: Secure deep links and App Links
+
+      - id: MASVS-PLATFORM-2
+        statement: The app uses WebViews securely.
+        description: >
+          Covers JavaScript disable-by-default, JavaScript interface bridge
+          security, file access restrictions, URL validation, SSL error handling,
+          WebView data clearing, and Safe Browsing.
+        sub_requirements:
+          - id: MASVS-PLATFORM-2.1
+            statement: Disable JavaScript unless required
+          - id: MASVS-PLATFORM-2.2
+            statement: Secure JavaScript interface bridges
+          - id: MASVS-PLATFORM-2.3
+            statement: Disable file access in WebViews
+          - id: MASVS-PLATFORM-2.4
+            statement: Validate URLs in shouldOverrideUrlLoading
+          - id: MASVS-PLATFORM-2.5
+            statement: Handle SSL errors correctly in WebViews
+          - id: MASVS-PLATFORM-2.6
+            statement: Clear WebView data after sensitive sessions
+          - id: MASVS-PLATFORM-2.7
+            statement: Use WebView Safe Browsing
+
+      - id: MASVS-PLATFORM-3
+        statement: The app uses the user interface securely.
+        description: >
+          Covers tapjacking/overlay protection, FLAG_SECURE, screen recording
+          detection, sensitive data masking, task hijacking prevention, and
+          accessibility service interaction.
+        sub_requirements:
+          - id: MASVS-PLATFORM-3.1
+            statement: Prevent tapjacking / overlay attacks
+          - id: MASVS-PLATFORM-3.2
+            statement: Use FLAG_SECURE for sensitive screens
+          - id: MASVS-PLATFORM-3.3
+            statement: Detect screen recording (Android 15+)
+          - id: MASVS-PLATFORM-3.4
+            statement: Mask sensitive data in the UI
+          - id: MASVS-PLATFORM-3.5
+            statement: Prevent task hijacking (StrandHogg)
+          - id: MASVS-PLATFORM-3.6
+            statement: Secure accessibility service interaction
+
+  - id: MASVS-CODE
+    index: 6
+    title: Code Quality and Supply Chain
+    description: >
+      Platform version requirements, forced update mechanisms, dependency security
+      and supply chain integrity, and input validation for all untrusted sources.
+    controls:
+      - id: MASVS-CODE-1
+        statement: The app requires an up-to-date platform version.
+        description: >
+          Covers minSdkVersion/targetSdkVersion requirements, user notification
+          of outdated OS, and API level checks for progressive security features.
+        sub_requirements:
+          - id: MASVS-CODE-1.1
+            statement: Set appropriate minSdkVersion (API 28+)
+          - id: MASVS-CODE-1.2
+            statement: Target the latest stable API level
+          - id: MASVS-CODE-1.3
+            statement: Prompt users on outdated OS versions
+          - id: MASVS-CODE-1.4
+            statement: Use API level checks for security features
+
+      - id: MASVS-CODE-2
+        statement: The app has a mechanism for enforcing app updates.
+        description: >
+          Covers In-App Updates API, server-side minimum version enforcement,
+          graceful update failure handling, and version telemetry.
+        sub_requirements:
+          - id: MASVS-CODE-2.1
+            statement: Implement In-App Update checks
+          - id: MASVS-CODE-2.2
+            statement: Implement minimum version enforcement (server-side)
+          - id: MASVS-CODE-2.3
+            statement: Handle update failures gracefully
+          - id: MASVS-CODE-2.4
+            statement: Monitor update adoption via version telemetry
+
+      - id: MASVS-CODE-3
+        statement: The app only uses software components without known vulnerabilities.
+        description: >
+          Covers dependency scanning, SBOM generation, version pinning, dependency
+          integrity verification, and third-party SDK attack surface minimization.
+        sub_requirements:
+          - id: MASVS-CODE-3.1
+            statement: Scan dependencies for known vulnerabilities
+          - id: MASVS-CODE-3.2
+            statement: Maintain a Software Bill of Materials (SBOM)
+          - id: MASVS-CODE-3.3
+            statement: Pin dependency versions
+          - id: MASVS-CODE-3.4
+            statement: Verify dependency integrity (checksums/PGP)
+          - id: MASVS-CODE-3.5
+            statement: Minimize third-party SDK attack surface
+
+      - id: MASVS-CODE-4
+        statement: The app validates and sanitizes all untrusted inputs.
+        description: >
+          Covers intent data validation, SQL injection prevention in Content
+          Providers, path traversal prevention, ZipSlip prevention, WebView
+          content sanitization, deep link parameter validation, safe
+          deserialization, and NFC/Bluetooth input validation.
+        sub_requirements:
+          - id: MASVS-CODE-4.1
+            statement: Validate intent extras and data URIs
+          - id: MASVS-CODE-4.2
+            statement: Prevent SQL injection in Content Providers
+          - id: MASVS-CODE-4.3
+            statement: Prevent path traversal in file operations
+          - id: MASVS-CODE-4.4
+            statement: Prevent Zip path traversal (ZipSlip)
+          - id: MASVS-CODE-4.5
+            statement: Sanitize data before WebView loading
+          - id: MASVS-CODE-4.6
+            statement: Validate deep link parameters
+          - id: MASVS-CODE-4.7
+            statement: Handle deserialization safely
+          - id: MASVS-CODE-4.8
+            statement: Validate NFC and Bluetooth input
+
+  - id: MASVS-RESILIENCE
+    index: 7
+    title: Resilience Against Reverse Engineering and Tampering
+    description: >
+      Defense-in-depth measures against platform compromise, app tampering,
+      static analysis (decompilation), and dynamic analysis (Frida, debugging).
+    controls:
+      - id: MASVS-RESILIENCE-1
+        statement: The app validates the integrity of the platform.
+        description: >
+          Covers Play Integrity API device attestation, multi-signal root
+          detection, native root checks, emulator detection, and graduated
+          response to integrity failures.
+        sub_requirements:
+          - id: MASVS-RESILIENCE-1.1
+            statement: Use Play Integrity API for device attestation
+          - id: MASVS-RESILIENCE-1.2
+            statement: Implement multi-signal root detection
+          - id: MASVS-RESILIENCE-1.3
+            statement: Perform root checks in native code
+          - id: MASVS-RESILIENCE-1.4
+            statement: Detect emulators
+          - id: MASVS-RESILIENCE-1.5
+            statement: Respond appropriately to platform integrity failures
+
+      - id: MASVS-RESILIENCE-2
+        statement: The app implements anti-tampering mechanisms.
+        description: >
+          Covers signing certificate verification, Play Integrity app verdict,
+          DEX/native library checksum verification, v2+ APK signing, installation
+          source verification, and redundant integrity checks.
+        sub_requirements:
+          - id: MASVS-RESILIENCE-2.1
+            statement: Verify app signing certificate at runtime
+          - id: MASVS-RESILIENCE-2.2
+            statement: Verify APK integrity via Play Integrity
+          - id: MASVS-RESILIENCE-2.3
+            statement: Detect DEX and native library modifications
+          - id: MASVS-RESILIENCE-2.4
+            statement: Use v2+ APK signing scheme
+          - id: MASVS-RESILIENCE-2.5
+            statement: Detect installation source
+          - id: MASVS-RESILIENCE-2.6
+            statement: Implement redundant integrity checks
+
+      - id: MASVS-RESILIENCE-3
+        statement: The app implements anti-static analysis mechanisms.
+        description: >
+          Covers R8 obfuscation, string literal encryption, control flow
+          obfuscation, native code obfuscation, and debug information removal.
+        sub_requirements:
+          - id: MASVS-RESILIENCE-3.1
+            statement: Enable R8 code shrinking and obfuscation
+          - id: MASVS-RESILIENCE-3.2
+            statement: Encrypt string literals containing sensitive values
+          - id: MASVS-RESILIENCE-3.3
+            statement: Apply control flow obfuscation (high-value apps)
+          - id: MASVS-RESILIENCE-3.4
+            statement: Obfuscate native code
+          - id: MASVS-RESILIENCE-3.5
+            statement: Remove debug information from release builds
+
+      - id: MASVS-RESILIENCE-4
+        statement: The app implements anti-dynamic analysis techniques.
+        description: >
+          Covers debugger detection, Frida/Xposed detection, anti-hook techniques,
+          runtime environment manipulation detection, timing-based detection, and
+          Play Integrity app access risk verdict.
+        sub_requirements:
+          - id: MASVS-RESILIENCE-4.1
+            statement: Detect debugging
+          - id: MASVS-RESILIENCE-4.2
+            statement: Detect Frida and dynamic instrumentation frameworks
+          - id: MASVS-RESILIENCE-4.3
+            statement: Implement anti-hook techniques
+          - id: MASVS-RESILIENCE-4.4
+            statement: Detect runtime environment manipulation
+          - id: MASVS-RESILIENCE-4.5
+            statement: Implement timing-based detection
+          - id: MASVS-RESILIENCE-4.6
+            statement: Use App Access Risk verdict (Android 15+)
+
+  - id: MASVS-PRIVACY
+    index: 8
+    title: Privacy
+    description: >
+      Data minimization, user identification prevention, transparent disclosures,
+      and user data control on Android.
+    controls:
+      - id: MASVS-PRIVACY-1
+        statement: The app minimizes access to sensitive data and resources.
+        description: >
+          Covers permission minimization, least-privilege permissions, graceful
+          denial handling, third-party SDK audit, consent enforcement, scoped
+          storage, and background access minimization.
+        sub_requirements:
+          - id: MASVS-PRIVACY-1.1
+            statement: Request only necessary permissions
+          - id: MASVS-PRIVACY-1.2
+            statement: Use the most restrictive permission available
+          - id: MASVS-PRIVACY-1.3
+            statement: Handle permission denials gracefully
+          - id: MASVS-PRIVACY-1.4
+            statement: Audit third-party SDK data collection
+          - id: MASVS-PRIVACY-1.5
+            statement: Enforce SDK consent compliance
+          - id: MASVS-PRIVACY-1.6
+            statement: Implement scoped storage correctly
+          - id: MASVS-PRIVACY-1.7
+            statement: Minimize background data access
+
+      - id: MASVS-PRIVACY-2
+        statement: The app prevents identification of the user.
+        description: >
+          Covers hardware identifier prohibition, privacy-preserving identifiers,
+          cross-purpose linking prevention, data anonymization, and device
+          fingerprinting minimization.
+        sub_requirements:
+          - id: MASVS-PRIVACY-2.1
+            statement: Do not use hardware device identifiers
+          - id: MASVS-PRIVACY-2.2
+            statement: Use privacy-preserving identifiers
+          - id: MASVS-PRIVACY-2.3
+            statement: Prevent cross-purpose identifier linking
+          - id: MASVS-PRIVACY-2.4
+            statement: Implement data anonymization for analytics
+          - id: MASVS-PRIVACY-2.5
+            statement: Minimize device fingerprinting signals
+
+      - id: MASVS-PRIVACY-3
+        statement: The app is transparent about data collection and usage.
+        description: >
+          Covers Google Play Data Safety Section accuracy, in-app privacy
+          disclosure, non-obvious data collection disclosure, privacy indicators,
+          and disclosure currency.
+        sub_requirements:
+          - id: MASVS-PRIVACY-3.1
+            statement: Complete and accurate Google Play Data Safety Section
+          - id: MASVS-PRIVACY-3.2
+            statement: Provide in-app privacy disclosure
+          - id: MASVS-PRIVACY-3.3
+            statement: Disclose non-obvious data collection
+          - id: MASVS-PRIVACY-3.4
+            statement: Display privacy indicators and notifications
+          - id: MASVS-PRIVACY-3.5
+            statement: Keep disclosures current
+
+      - id: MASVS-PRIVACY-4
+        statement: The app offers user control over their data.
+        description: >
+          Covers data deletion capability, granular consent management, consent
+          withdrawal handling, data export/portability, expanded collection
+          re-prompting, and Android permission settings integration.
+        sub_requirements:
+          - id: MASVS-PRIVACY-4.1
+            statement: Provide data deletion capability
+          - id: MASVS-PRIVACY-4.2
+            statement: Allow granular consent management
+          - id: MASVS-PRIVACY-4.3
+            statement: Respect consent withdrawal
+          - id: MASVS-PRIVACY-4.4
+            statement: Support data export / portability
+          - id: MASVS-PRIVACY-4.5
+            statement: Re-prompt on expanded data collection
+          - id: MASVS-PRIVACY-4.6
+            statement: Integrate with Android permission settings
