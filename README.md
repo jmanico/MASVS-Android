@@ -22,7 +22,7 @@ The upstream OWASP MASVS is intentionally platform-agnostic — it defines *what
 
 ## Scope
 
-- Covers **Android 10 (API 29) through Android 16 (API 36)** with notes on version-specific behaviors
+- Covers **Android 10 (API 29) through Android 17 (API 37)** with notes on version-specific behaviors
 - References the **Android SDK, AndroidX/Jetpack, Google Play Services, and Google Tink** libraries
 - Maps to **OWASP Mobile Top 10 2024**, **NIST SP 800-163**, and **CIS Android Benchmarks**
 - Covers **native (Kotlin/Java)** apps; Flutter/React Native/Xamarin apps should also apply their framework-specific guidance
@@ -41,6 +41,21 @@ The upstream OWASP MASVS is intentionally platform-agnostic — it defines *what
 | 8 | [MASVS-PRIVACY](Document/12-MASVS-PRIVACY.md) | 4 controls, 18 sub-requirements | Privacy and data minimization |
 
 **Total: 24 controls, 144 Android-specific sub-requirements**
+
+## Training-Aligned Requirements
+
+The [`requirements/`](requirements/) directory contains **93 additional testable requirements** derived from OWASP/Manicode mobile security training content, organized by MASVS control group:
+
+| File | Requirements | Key Topics |
+|------|-------------|------------|
+| [MASVS-STORAGE-ANDROID.md](requirements/MASVS-STORAGE-ANDROID.md) | 13 | Keystore/StrongBox, EncryptedSharedPreferences, backup exclusion, FLAG_SECURE |
+| [MASVS-CRYPTO-ANDROID.md](requirements/MASVS-CRYPTO-ANDROID.md) | 11 | AES-256-GCM, hardware key generation, key attestation, HPKE post-quantum |
+| [MASVS-AUTH-ANDROID.md](requirements/MASVS-AUTH-ANDROID.md) | 12 | CryptoObject biometric binding, Credential Manager/passkeys, DPoP, OAuth |
+| [MASVS-NETWORK-ANDROID.md](requirements/MASVS-NETWORK-ANDROID.md) | 8 | Certificate Transparency, TLS 1.3, Network Security Configuration |
+| [MASVS-PLATFORM-ANDROID.md](requirements/MASVS-PLATFORM-ANDROID.md) | 14 | App Links, Intent security, WebView hardening, QR/NFC validation |
+| [MASVS-CODE-ANDROID.md](requirements/MASVS-CODE-ANDROID.md) | 12 | Play App Signing, SBOM, SDK supply chain vetting, reproducible builds |
+| [MASVS-RESILIENCE-ANDROID.md](requirements/MASVS-RESILIENCE-ANDROID.md) | 12 | Play Integrity API, R8 obfuscation, root/Frida detection |
+| [MASVS-PRIVACY-ANDROID.md](requirements/MASVS-PRIVACY-ANDROID.md) | 11 | Scoped Storage, selected photos access, SDK consent gating, data deletion |
 
 ## Upstream Mapping
 
